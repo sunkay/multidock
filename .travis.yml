@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t sunkay/react-test -f ./client/Dockerfile.dev .
+
+scripts:
+  - docker run sunkay/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t sunkay/multi-client ./cient
+  - docker build -t sunkay/multi-nginx ./nginx
+  - docker build -t sunkay/multi-server ./server
+  - docker build -t sunkay/multi-worker ./worker
+  # Log into docker CLI; setup encrypted creds in travis CI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Push to dockerhub
+  - docker push sunkay/multi-client
+  - docker push sunkay/multi-nginx
+  - docker push sunkay/multi-server
+  - docker push sunkay/multi-worker  
