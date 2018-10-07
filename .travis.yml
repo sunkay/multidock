@@ -5,18 +5,18 @@ services:
 before_install:
   - docker build -t sunkay/react-test -f ./client/Dockerfile.dev ./client
 
-scripts:
+script:
   - docker run sunkay/react-test npm test -- --coverage
 
 after_success:
-  - docker build -t sunkay/multi-client ./cient
+  - docker build -t sunkay/multi-client ./client
   - docker build -t sunkay/multi-nginx ./nginx
   - docker build -t sunkay/multi-server ./server
   - docker build -t sunkay/multi-worker ./worker
-  # Log into docker CLI; setup encrypted creds in travis CI
+  # Log in to the docker CLI
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # Push to dockerhub
+  # Take those images and push them to docker hub
   - docker push sunkay/multi-client
   - docker push sunkay/multi-nginx
   - docker push sunkay/multi-server
-  - docker push sunkay/multi-worker  
+  - docker push sunkay/multi-worker
